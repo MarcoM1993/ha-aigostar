@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.RELEASE_TOKEN }}
+          token: ${{ secrets.RELEASE_SECRET }}
 
       - name: Configure git
         run: |
@@ -136,7 +136,7 @@ jobs:
       - name: Create GitHub Release
         if: steps.bump.outputs.skip != 'true'
         env:
-          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GH_TOKEN: ${{ secrets.RELEASE_SECRET }}
         run: |
           VERSION="${{ steps.bump.outputs.version }}"
           cat << 'NOTES' > /tmp/release_notes.md
@@ -150,7 +150,7 @@ jobs:
       - name: Merge-back PR to dev
         if: steps.bump.outputs.skip != 'true'
         env:
-          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GH_TOKEN: ${{ secrets.RELEASE_SECRET }}
         run: |
           VERSION="${{ steps.bump.outputs.version }}"
           EXISTING=$(gh pr list --base dev --head main --state open --json number -q '.[0].number' || echo "")
