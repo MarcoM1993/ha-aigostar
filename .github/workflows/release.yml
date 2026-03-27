@@ -147,20 +147,12 @@ jobs:
             --notes-file /tmp/release_notes.md \
             --latest
 
-      - name: Merge-back PR to dev
+      - name: Merge-back to dev
         if: steps.bump.outputs.skip != 'true'
-        env:
-          GH_TOKEN: ${{ secrets.RELEASE_SECRET }}
         run: |
           VERSION="${{ steps.bump.outputs.version }}"
-          EXISTING=$(gh pr list --base dev --head main --state open --json number -q '.[0].number' || echo "")
-          if [ -n "$EXISTING" ]; then
-            echo "Merge-back PR #${EXISTING} already exists"
-          else
-            gh pr create \
-              --base dev \
-              --head main \
-              --title "chore: merge-back v${VERSION} to dev" \
-              --body "Automatic merge-back of release v${VERSION} from main to dev." \
-              || echo "Branches already in sync"
-          fi
+          git fetch origin dev
+          git checkout dev
+          git merge main --no-edit -m "chore: merge-back v${VERSION} to dev"
+          git push origin dev
+          echo "Merged main (v${VERSION}) back into dev"
