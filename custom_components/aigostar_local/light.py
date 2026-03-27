@@ -21,6 +21,7 @@ from homeassistant.components.light import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .alibaba_api import AlibabaIoTClient
@@ -66,7 +67,7 @@ async def async_setup_entry(
             app_key=app_key,
             app_secret=app_secret,
         )
-        entities.append(AigostarLight(client, iot_id, nick, online=(status == 1)))
+        entities.append(AigostarLight(client, iot_id, nick, online=(status == 1), raw_device=dev))
 
     # Register entities for token refresh
     hass.data.setdefault(f"{DOMAIN}_entities", {})
@@ -80,15 +81,30 @@ class AigostarLight(LightEntity):
     """Aigostar smart bulb via Alibaba Cloud IoT."""
 
     _attr_has_entity_name = True
+    _attr_name = None  # Use device name as entity name
     _attr_supported_color_modes = {ColorMode.COLOR_TEMP}
     _attr_color_mode            = ColorMode.COLOR_TEMP
     _attr_min_color_temp_kelvin = KELVIN_WARM
     _attr_max_color_temp_kelvin = KELVIN_COOL
 
-    def __init__(self, client: AlibabaIoTClient, iot_id: str, name: str, online: bool) -> None:
+    def __init__(
+        self, client: AlibabaIoTClient, iot_id: str, name: str,
+        online: bool, raw_device: dict | None = None,
+    ) -> None:
         self._client = client
         self._attr_unique_id = iot_id
-        self._attr_name      = name
+
+        raw = raw_device or {}
+        product_name = raw.get("productName") or raw.get("categoryName") or "Smart Bulb"
+        fw_version = raw.get("firmwareVersion") or raw.get("moduleVersion") or None
+
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, iot_id)},
+            name=name,
+            manufacturer="Aigostar",
+            model=product_name,
+            sw_version=fw_version,
+        )
 
         self._is_on:        bool = False
         self._brightness:   int  = 255
