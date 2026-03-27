@@ -1,0 +1,166 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Auto Release
+    runs-on: ubuntu-latest
+    if: "!startsWith(github.event.head_commit.message, 'chore(release):')"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get last tag
+        id: last_tag
+        run: |
+          TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Last tag: ${TAG:-none}"
+
+      - name: Analyze commits and determine bump
+        id: bump
+        run: |
+          LAST_TAG="${{ steps.last_tag.outputs.tag }}"
+
+          if [ -z "$LAST_TAG" ]; then
+            CURRENT=$(python3 -c "import json; print(json.load(open('custom_components/aigostar_local/manifest.json'))['version'])")
+            COMMITS=$(git log --pretty=format:"%s")
+          else
+            CURRENT="${LAST_TAG#v}"
+            COMMITS=$(git log "${LAST_TAG}..HEAD" --pretty=format:"%s")
+          fi
+
+          if [ -z "$COMMITS" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "No new commits since last tag, skipping"
+            exit 0
+          fi
+
+          MAJOR=$(echo "$CURRENT" | cut -d. -f1)
+          MINOR=$(echo "$CURRENT" | cut -d. -f2)
+          PATCH=$(echo "$CURRENT" | cut -d. -f3)
+
+          BUMP="patch"
+          if echo "$COMMITS" | grep -qE "^feat(\(.+\))?!:|BREAKING CHANGE"; then
+            BUMP="major"
+          elif echo "$COMMITS" | grep -qE "^feat(\(.+\))?:"; then
+            BUMP="minor"
+          fi
+
+          case $BUMP in
+            major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
+            minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
+            patch) PATCH=$((PATCH + 1)) ;;
+          esac
+
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "bump=$BUMP" >> "$GITHUB_OUTPUT"
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "Bump: $BUMP ($CURRENT -> $NEW_VERSION)"
+
+      - name: Generate changelog
+        if: steps.bump.outputs.skip != 'true'
+        id: changelog
+        run: |
+          LAST_TAG="${{ steps.last_tag.outputs.tag }}"
+          if [ -z "$LAST_TAG" ]; then
+            RANGE=""
+          else
+            RANGE="${LAST_TAG}..HEAD"
+          fi
+
+          FEATURES=$(git log $RANGE --pretty=format:"%s" | grep -E "^feat(\(.+\))?:?" | sed -E 's/^feat(\([^)]*\))?!?:\s*//' || true)
+          FIXES=$(git log $RANGE --pretty=format:"%s" | grep -E "^fix(\(.+\))?:?" | sed -E 's/^fix(\([^)]*\))?!?:\s*//' || true)
+          OTHERS=$(git log $RANGE --pretty=format:"%s" | grep -vE "^(feat|fix|chore|ci|docs|style|refactor|test)(\(.+\))?:?" || true)
+
+          {
+            echo "body<<ENDOFCHANGELOG"
+            if [ -n "$FEATURES" ]; then
+              echo "### Features"
+              echo "$FEATURES" | while IFS= read -r line; do [ -n "$line" ] && echo "- $line"; done
+              echo ""
+            fi
+            if [ -n "$FIXES" ]; then
+              echo "### Bug Fixes"
+              echo "$FIXES" | while IFS= read -r line; do [ -n "$line" ] && echo "- $line"; done
+              echo ""
+            fi
+            if [ -n "$OTHERS" ]; then
+              echo "### Other"
+              echo "$OTHERS" | while IFS= read -r line; do [ -n "$line" ] && echo "- $line"; done
+              echo ""
+            fi
+            echo "ENDOFCHANGELOG"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Bump version in manifest.json
+        if: steps.bump.outputs.skip != 'true'
+        run: |
+          VERSION="${{ steps.bump.outputs.version }}"
+          python3 << PYEOF
+          import json
+          path = "custom_components/aigostar_local/manifest.json"
+          with open(path) as f:
+              data = json.load(f)
+          data["version"] = "${VERSION}"
+          with open(path, "w") as f:
+              json.dump(data, f, indent=2)
+              f.write("\n")
+          PYEOF
+
+      - name: Commit, tag, and push
+        if: steps.bump.outputs.skip != 'true'
+        run: |
+          VERSION="${{ steps.bump.outputs.version }}"
+          git add custom_components/aigostar_local/manifest.json
+          git diff --cached --quiet && echo "No version change" && exit 0
+          git commit -m "chore(release): v${VERSION}"
+          git tag "v${VERSION}"
+          git push origin main --tags
+
+      - name: Create GitHub Release
+        if: steps.bump.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          VERSION="${{ steps.bump.outputs.version }}"
+          cat << 'NOTES' > /tmp/release_notes.md
+          ${{ steps.changelog.outputs.body }}
+          NOTES
+          gh release create "v${VERSION}" \
+            --title "v${VERSION}" \
+            --notes-file /tmp/release_notes.md \
+            --latest
+
+      - name: Merge-back PR to dev
+        if: steps.bump.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          VERSION="${{ steps.bump.outputs.version }}"
+          EXISTING=$(gh pr list --base dev --head main --state open --json number -q '.[0].number' || echo "")
+          if [ -n "$EXISTING" ]; then
+            echo "Merge-back PR #${EXISTING} already exists"
+          else
+            gh pr create \
+              --base dev \
+              --head main \
+              --title "chore: merge-back v${VERSION} to dev" \
+              --body "Automatic merge-back of release v${VERSION} from main to dev." \
+              || echo "Branches already in sync"
+          fi
