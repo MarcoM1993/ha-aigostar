@@ -3,8 +3,6 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/MarcoM1993/ha-aigostar?style=for-the-badge)](https://github.com/MarcoM1993/ha-aigostar/releases)
-[![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C.svg?style=for-the-badge&logo=paypal)](https://paypal.me/marcomicheli93)
-
 A Home Assistant custom integration for **Aigostar smart bulbs** (TG7100C chipset, Alibaba Cloud IoT backend).
 
 Control your Aigostar lights directly from Home Assistant — no local flashing required. The integration communicates with Alibaba Cloud IoT using the same protocol as the AigoSmart app.
@@ -96,6 +94,18 @@ Device control is performed via the Alibaba Cloud IoT API Gateway (`eu-central-1
 ### New bulbs not appearing
 - Wait up to 5 minutes for auto-sync, or call `aigostar_local.sync_devices`
 - You can also reload the integration: **Settings** → **Integrations** → **Aigostar** → **⋮** → **Reload**
+
+## Support This Project
+
+This integration was built from scratch by reverse engineering the AigoSmart app — no public API, no documentation, just hours of packet sniffing and APK decompilation.
+
+If it saved you time or you just enjoy using it, consider buying me a coffee. It keeps the project alive and motivates new features and device support.
+
+<a href="https://paypal.me/marcomicheli93">
+  <img src="https://img.shields.io/badge/Support%20via-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Support via PayPal" height="40">
+</a>
+
+Every contribution — no matter how small — is truly appreciated. Thank you!
 
 ## Disclaimer
 
