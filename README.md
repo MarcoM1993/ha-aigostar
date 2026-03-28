@@ -3,6 +3,7 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/MarcoM1993/ha-aigostar?style=for-the-badge)](https://github.com/MarcoM1993/ha-aigostar/releases)
+[![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C.svg?style=for-the-badge&logo=paypal)](https://paypal.me/marcomicheli93)
 
 A Home Assistant custom integration for **Aigostar smart bulbs** (TG7100C chipset, Alibaba Cloud IoT backend).
 
