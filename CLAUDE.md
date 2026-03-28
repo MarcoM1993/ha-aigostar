@@ -98,4 +98,5 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Content-Type: application/json
 
 - Code, comments, docstrings, log messages: **English**
 - User communicates in **Italian** — respond in Italian
+- All code, comments, docstrings, log messages, and CLI output must be in **English**
 - UI translations exist for both English and Italian
