@@ -1,4 +1,4 @@
-"""Config flow for Aigostar (Alibaba Cloud IoT) — email + password login."""
+"""Config flow for Aigostar — email + password login."""
 from __future__ import annotations
 
 import logging

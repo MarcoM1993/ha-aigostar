@@ -131,7 +131,7 @@ PATH_SEND_CODE = "/message/v1.1/security/sendcode/anonymous"
 PATH_VERIFY_CODE = "/message/v1.1/security/verify/anonymous"
 
 # Deterministic device ID (persists across restarts to avoid repeated security codes)
-_DEVICE_ID = str(uuid.uuid5(uuid.NAMESPACE_DNS, "aigostar_local.homeassistant")).replace("-", "")
+_DEVICE_ID = str(uuid.uuid5(uuid.NAMESPACE_DNS, "aigostar.homeassistant")).replace("-", "")
 
 
 def _smart_api_post(path: str, body: dict) -> dict:

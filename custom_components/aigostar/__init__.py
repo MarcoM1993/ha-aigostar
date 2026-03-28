@@ -1,4 +1,4 @@
-"""Aigostar (Alibaba Cloud IoT) integration for Home Assistant — automatic login."""
+"""Aigostar integration for Home Assistant — automatic login."""
 from __future__ import annotations
 
 import logging
@@ -140,7 +140,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     entry_data["unsub_refresh"] = unsub_refresh
     entry_data["unsub_sync"] = unsub_sync
 
-    # Manual service: aigostar_local.sync_devices (reloads the integration)
+    # Manual service: aigostar.sync_devices (reloads the integration)
     async def _handle_sync_service(call: ServiceCall) -> None:
         for eid in list(hass.data.get(DOMAIN, {})):
             cfg_entry = hass.config_entries.async_get_entry(eid)

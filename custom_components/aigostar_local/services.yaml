@@ -1,3 +1,0 @@
-sync_devices:
-  name: Sync devices
-  description: Re-discover all devices from the Aigostar cloud and add new ones.

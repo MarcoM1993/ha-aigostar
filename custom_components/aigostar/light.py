@@ -1,5 +1,5 @@
 """
-Light platform for Aigostar (Alibaba Cloud IoT) — multi-device support.
+Light platform for Aigostar — multi-device support.
 
 Supported TSL properties (TG7100C):
   - LightSwitch      bool  0/1
@@ -78,7 +78,7 @@ async def async_setup_entry(
 
 
 class AigostarLight(LightEntity):
-    """Aigostar smart bulb via Alibaba Cloud IoT."""
+    """Aigostar smart bulb."""
 
     _attr_has_entity_name = True
     _attr_name = None  # Use device name as entity name

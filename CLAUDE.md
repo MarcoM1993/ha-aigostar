@@ -41,7 +41,7 @@ The integration communicates via the Alibaba Cloud IoT API Gateway using x-ca-si
 ## File Structure
 
 ```
-custom_components/aigostar_local/
+custom_components/aigostar/
 ├── __init__.py      — Entry setup, token refresh, device sync, service registration
 ├── alibaba_api.py   — Full API client: login flow, device list, property get/set
 ├── brand/           — Integration icons for HA 2026.3+ (icon.png, icon@2x.png)
@@ -57,7 +57,7 @@ custom_components/aigostar_local/
 ## Key Technical Details
 
 - **Token refresh**: iotToken expires (default 7200s). Refreshed automatically every hour via `refreshToken` or full re-login as fallback.
-- **Device sync**: New devices auto-detected every 5 minutes. Manual sync via `aigostar_local.sync_devices` service.
+- **Device sync**: New devices auto-detected every 5 minutes. Manual sync via `aigostar.sync_devices` service.
 - **Polling interval**: 30 seconds (`SCAN_INTERVAL_SECONDS` in const.py).
 - **EU region**: All endpoints use eu-central-1. Region is resolved dynamically via the region API.
 - **OA login quirk**: `oauthPlateform` must be integer `23`, not string. Field name is intentionally misspelled (matches the API).
@@ -97,7 +97,7 @@ python3 -c "f=open('/tmp/.sshpw','w'); f.write('YOUR_PASSWORD'); f.close()"
 
 # Sync files to HA
 sshpass -f /tmp/.sshpw rsync -av -e "ssh -o PreferredAuthentications=password -o StrictHostKeyChecking=no" \
-  custom_components/aigostar_local/ USER@HA_IP:/config/custom_components/aigostar_local/
+  custom_components/aigostar/ USER@HA_IP:/config/custom_components/aigostar/
 
 # Restart HA via API
 curl -s -X POST -H "Authorization: Bearer YOUR_TOKEN" \
@@ -113,7 +113,7 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Content-Type: application/json
 
 # Call sync service
 curl -X POST -H "Authorization: Bearer TOKEN" -H "Content-Type: application/json" \
-  -d '{}' http://HA_IP:8123/api/services/aigostar_local/sync_devices
+  -d '{}' http://HA_IP:8123/api/services/aigostar/sync_devices
 ```
 
 ## Language

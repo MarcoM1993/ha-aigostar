@@ -29,7 +29,7 @@
   "services": {
     "sync_devices": {
       "name": "Sincronizza dispositivi",
-      "description": "Riscopri tutti i dispositivi dal cloud Aigostar e aggiungi quelli nuovi."
+      "description": "Riscopri tutti i dispositivi dal tuo account Aigostar e aggiungi quelli nuovi."
     }
   }
 }

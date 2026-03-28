@@ -3,16 +3,15 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/MarcoM1993/ha-aigostar?style=for-the-badge)](https://github.com/MarcoM1993/ha-aigostar/releases)
-A Home Assistant custom integration for **Aigostar smart bulbs** (TG7100C chipset, Alibaba Cloud IoT backend).
+A Home Assistant custom integration for **Aigostar smart bulbs** (TG7100C chipset).
 
-Control your Aigostar lights directly from Home Assistant — no local flashing required. The integration communicates with Alibaba Cloud IoT using the same protocol as the AigoSmart app.
+Control your Aigostar lights directly from Home Assistant — no local flashing required. The integration communicates with the same backend as the AigoSmart app.
 
 ## Features
 
-- **Cloud-based control** via Alibaba Cloud IoT API (EU region)
 - **Automatic device discovery** — all bulbs linked to your AigoSmart account are added automatically
 - **Periodic device sync** — new bulbs added via the AigoSmart app are detected every 5 minutes
-- **Manual sync service** — `aigostar_local.sync_devices` to force device re-discovery
+- **Manual sync service** — `aigostar.sync_devices` to force device re-discovery
 - **Automatic token refresh** — iotToken is renewed before expiration
 - **Brightness control** (1–100%)
 - **Color temperature** (2700K warm – 6500K cool)
@@ -23,9 +22,9 @@ Control your Aigostar lights directly from Home Assistant — no local flashing 
 
 | Device | Chipset | Protocol | Status |
 |--------|---------|----------|--------|
-| Aigostar smart bulb (E27/E14/GU10) | TG7100C (Bouffalo Lab) | Alibaba Cloud IoT | Tested |
+| Aigostar smart bulb (E27/E14/GU10) | TG7100C (Bouffalo Lab) | AigoSmart | Tested |
 
-> Other Aigostar smart devices using the same Alibaba Cloud IoT backend may work but have not been tested.
+> Other Aigostar smart devices using the AigoSmart app may work but have not been tested.
 
 ## Installation
 
@@ -45,12 +44,12 @@ Click the button above, or manually:
 ### Manual
 
 1. Download or clone this repository
-2. Copy the `custom_components/aigostar_local` folder to your Home Assistant `config/custom_components/` directory
+2. Copy the `custom_components/aigostar` folder to your Home Assistant `config/custom_components/` directory
 3. Restart Home Assistant
 
 ## Configuration
 
-[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=aigostar_local)
+[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=aigostar)
 
 Or manually:
 
@@ -62,9 +61,9 @@ Or manually:
 
 ## Services
 
-### `aigostar_local.sync_devices`
+### `aigostar.sync_devices`
 
-Force re-discovery of all devices from the Aigostar cloud. New devices are added automatically. You can call this service from:
+Force re-discovery of all devices from your Aigostar account. New devices are added automatically. You can call this service from:
 
 - **Developer Tools** → **Services**
 - Automations or scripts
@@ -79,7 +78,7 @@ The integration uses the same 5-step login flow as the AigoSmart Android app (re
 4. **OAuth Login** — exchange the authCode for an OA session ID
 5. **IoT Session** — exchange the session ID for an iotToken
 
-Device control is performed via the Alibaba Cloud IoT API Gateway (`eu-central-1.api-iot.aliyuncs.com`) using x-ca-signature authentication.
+Device control is performed via the same API gateway used by the AigoSmart app.
 
 ## Troubleshooting
 
@@ -92,7 +91,7 @@ Device control is performed via the Alibaba Cloud IoT API Gateway (`eu-central-1
 - Check that the bulb works in the AigoSmart app first
 
 ### New bulbs not appearing
-- Wait up to 5 minutes for auto-sync, or call `aigostar_local.sync_devices`
+- Wait up to 5 minutes for auto-sync, or call `aigostar.sync_devices`
 - You can also reload the integration: **Settings** → **Integrations** → **Aigostar** → **⋮** → **Reload**
 
 ## Support This Project
@@ -107,9 +106,13 @@ If it saved you time or you just enjoy using it, consider buying me a coffee. It
 
 Every contribution — no matter how small — is truly appreciated. Thank you!
 
+## Contact
+
+For questions, suggestions, or bug reports: **marcomicheli1993@gmail.com**
+
 ## Disclaimer
 
-This integration is unofficial and not affiliated with Aigostar or Alibaba Cloud. It was developed through reverse engineering of the AigoSmart Android app for personal and educational use. Use at your own risk.
+This integration is unofficial and not affiliated with Aigostar. It was developed through reverse engineering of the AigoSmart Android app for personal and educational use. Use at your own risk.
 
 ## License
 

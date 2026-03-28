@@ -1,0 +1,3 @@
+sync_devices:
+  name: Sync devices
+  description: Re-discover all devices from your Aigostar account and add new ones.

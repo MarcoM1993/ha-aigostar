@@ -37,7 +37,7 @@ jobs:
           LAST_TAG="${{ steps.last_tag.outputs.tag }}"
 
           if [ -z "$LAST_TAG" ]; then
-            CURRENT=$(python3 -c "import json; print(json.load(open('custom_components/aigostar_local/manifest.json'))['version'])")
+            CURRENT=$(python3 -c "import json; print(json.load(open('custom_components/aigostar/manifest.json'))['version'])")
             COMMITS=$(git log --pretty=format:"%s")
           else
             CURRENT="${LAST_TAG#v}"
@@ -114,7 +114,7 @@ jobs:
           VERSION="${{ steps.bump.outputs.version }}"
           python3 << PYEOF
           import json
-          path = "custom_components/aigostar_local/manifest.json"
+          path = "custom_components/aigostar/manifest.json"
           with open(path) as f:
               data = json.load(f)
           data["version"] = "${VERSION}"
@@ -127,7 +127,7 @@ jobs:
         if: steps.bump.outputs.skip != 'true'
         run: |
           VERSION="${{ steps.bump.outputs.version }}"
-          git add custom_components/aigostar_local/manifest.json
+          git add custom_components/aigostar/manifest.json
           git diff --cached --quiet && echo "No version change" && exit 0
           git commit -m "chore(release): v${VERSION}"
           git tag "v${VERSION}"
